@@ -64,3 +64,7 @@ block content
     p
       b For sale price (note that a for sale price of 0 means not for sale): 
       | $#{apt.forSalePrice}
+    if apt.apartmentNumber == 902
+      p  
+        b Video tour link (ex. YouTube video): 
+          a(href="https://www.youtube.com/watch?v=ujyNWQvdN9Q") #{"https://www.youtube.com/watch?v=ujyNWQvdN9Q"}
