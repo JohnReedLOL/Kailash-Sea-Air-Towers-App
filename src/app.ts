@@ -8,7 +8,7 @@ import flash from "express-flash";
 import path from "path";
 import mongoose from "mongoose";
 import passport from "passport";
-import passportLocal from "passport-local";
+import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 
 // Controllers (route handlers)
@@ -27,7 +27,7 @@ const app = express();
 
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
-
+mongoose.Promise = bluebird;
 
 /*
 Note: When I did "npm start" from the terminal I got this:
@@ -39,11 +39,13 @@ Googling the error gave me this: https://stackoverflow.com/questions/57895175/se
 The weird thing is I have "useUnifiedTopology: true" below. I don't know what's wrong.
 */
 
-mongoose.connect(mongoUrl).then(
-    () => { /* ready to use */ },
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } ).then(
+    () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
 ).catch(err => {
-    console.log(`MongoDB connection error. ${err}`);
+    console.log(`MongoDB connection error. Please make sure MongoDB is running. ${err}`);
+    // process.exit();
 });
+
 // Express configuration
 // app.set("port", process.env.PORT || 3000);
 // Heroku requres port 8000
@@ -58,8 +60,11 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     secret: SESSION_SECRET,
-    store: MongoStore.create({
-        mongoUrl
+    store: new MongoStore({
+        mongoUrl,
+        mongoOptions: {
+            autoReconnect: true
+        }
     })
 }));
 app.use(passport.initialize());
@@ -97,7 +102,8 @@ app.get("/", homeController.index);
 app.get("/login", userController.getLogin);
 app.post("/login", userController.postLogin);
 app.get("/logout", userController.logout);
-app.post("/forgot", userController.postForgot); // Note: I removed the GET /forgot route because there is no page for it. The user just enters their email in the login page and then that POST /forgot route sends them an email with a link to reset their password.
+app.get("/forgot", userController.getForgot);
+app.post("/forgot", userController.postForgot);
 app.get("/reset/:token", userController.getReset);
 app.post("/reset/:token", userController.postReset);
 app.get("/signup", userController.getSignup);
