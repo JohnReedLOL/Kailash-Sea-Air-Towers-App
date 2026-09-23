@@ -3,6 +3,8 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 
 export type LandlordDocument = mongoose.Document & {
+    id?: any;
+    _id: any;
     email: string;
     password: string;
     passwordResetToken: string;

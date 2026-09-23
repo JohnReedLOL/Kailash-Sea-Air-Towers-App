@@ -8,7 +8,6 @@ import flash from "express-flash";
 import path from "path";
 import mongoose from "mongoose";
 import passport from "passport";
-import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 
 // Controllers (route handlers)
@@ -27,7 +26,6 @@ const app = express();
 
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
-mongoose.Promise = bluebird;
 
 /*
 Note: When I did "npm start" from the terminal I got this:
@@ -39,7 +37,8 @@ Googling the error gave me this: https://stackoverflow.com/questions/57895175/se
 The weird thing is I have "useUnifiedTopology: true" below. I don't know what's wrong.
 */
 
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } ).then(
+// mongoose.connect(mongoUrl, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } ).then(
+mongoose.connect(mongoUrl).then(
     () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
 ).catch(err => {
     console.log(`MongoDB connection error. Please make sure MongoDB is running. ${err}`);
@@ -60,11 +59,14 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     secret: SESSION_SECRET,
-    store: new MongoStore({
-        mongoUrl,
-        mongoOptions: {
-            autoReconnect: true
-        }
+    // store: new MongoStore({
+    //     mongoUrl,
+    //     mongoOptions: {
+    //         autoReconnect: true
+    //     }
+
+    store: MongoStore.create({
+        mongoUrl
     })
 }));
 app.use(passport.initialize());
@@ -79,13 +81,13 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     // After successful login, redirect back to the intended page
     if (!req.user &&
-    req.path !== "/login" &&
-    req.path !== "/signup" &&
-    !req.path.match(/^\/auth/) &&
-    !req.path.match(/\./)) {
+        req.path !== "/login" &&
+        req.path !== "/signup" &&
+        !req.path.match(/^\/auth/) &&
+        !req.path.match(/\./)) {
         req.session.returnTo = req.path;
     } else if (req.user &&
-    req.path == "/account") {
+        req.path == "/account") {
         req.session.returnTo = req.path;
     }
     next();

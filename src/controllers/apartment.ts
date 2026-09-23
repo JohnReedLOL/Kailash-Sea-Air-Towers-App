@@ -6,7 +6,6 @@ import { Apartment, ApartmentDocument } from "../models/Apartment";
 import { ApartmentBookings, ApartmentBookingsDocument } from "../models/ApartmentBookings";
 import { Landlord, LandlordDocument } from "../models/Landlord";
 import { Request, Response, NextFunction } from "express";
-import { WriteError } from "mongodb";
 import { check, validationResult } from "express-validator";
 import "../config/passport";
 // if you want to use the Facebook strategy, you will need to import the User model as well, since the Facebook strategy references it in the code.

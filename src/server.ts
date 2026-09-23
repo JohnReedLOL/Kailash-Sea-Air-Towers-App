@@ -5,23 +5,20 @@ import app from "./app";
 /**
  * Error Handler. Provides full stack
  */
-// Note: I thought I wanted to always be in a dev environment, so I don't know why I commented this out in my original application, but in order to keep things the same for this re-write I am commenting this out here too.
-/*
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" || !process.env.NODE_ENV) {
+    app.set("env", "development");
     app.use(errorHandler());
+} else {
+    app.set("env", process.env.NODE_ENV);
 }
-*/
 
-// Nah, I want the errorHandler:
-// app.use(errorHandler());
-
-// Nah, I want prod now, no "app.use(errorHandler());"
-
-// I always want the environment to be "dev" (maybe I was supposed to use the word "development" instead of "dev", I'm not sure)
-// app.set("env", "dev");
-
-// Nah, I want production now, set it to "production"
-app.set("env", "production");
+app.use((err: any, req: any, res: any, next: any) => {
+    console.error(`[Server Error] ${req.method} ${req.url}:`, err);
+    if (res.headersSent) {
+        return next(err);
+    }
+    res.status(500).send("Internal Server Error: " + (err.message || err));
+});
 
 /**
  * Start Express server.
