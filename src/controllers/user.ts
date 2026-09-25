@@ -272,7 +272,7 @@ export const getReset = async (req: Request, res: Response, next: NextFunction):
             .findOne({ passwordResetToken: req.params.token })
             .where("passwordResetExpires").gt(Date.now());
         if (!user) {
-            req.flash("errors", { msg: "Password reset token is invalid or has expired." });
+            req.flash("errors", { msg: "Password reset token is invalid or has expired. Consider making a new password reset." });
             return res.redirect("/forgot");
         }
         res.render("account/reset", {
