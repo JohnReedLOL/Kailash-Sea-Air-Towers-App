@@ -357,7 +357,7 @@ export const postReset = async (req: Request, res: Response, next: NextFunction)
             .where("passwordResetExpires").gt(Date.now());
 
         if (!user) {
-            req.flash("errors", { msg: "Password reset token is invalid or has expired." });
+            req.flash("errors", { msg: "Password reset token is invalid or has expired. Consider making a new password reset." });
             return res.redirect("back");
         }
 
