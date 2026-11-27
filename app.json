@@ -1,0 +1,13 @@
+{
+    "name": "Sea Air Towers",
+    "description": "Vacation rental platform for Sea Air Towers condo owners",
+    "stack": "heroku-24",
+    "keywords": [
+        "node",
+        "express",
+        "typescript"
+    ],
+    "scripts": {
+        "postdeploy": "npm run build"
+    }
+}
