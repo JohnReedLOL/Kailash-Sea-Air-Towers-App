@@ -290,7 +290,7 @@ export const getReset = async (req: Request, res: Response, next: NextFunction):
  * 2. SendGrid (SENDGRID_API_KEY)
  * 3. Gmail / Other service (EMAIL_USER, EMAIL_PASS / EMAIL_PASSWORD, optional EMAIL_SERVICE)
  */
-const createMailTransporter = () => {
+export const createMailTransporter = () => {
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
         return nodemailer.createTransport({
             host: process.env.SMTP_HOST,
